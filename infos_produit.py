@@ -18,7 +18,7 @@ field_names = ["product_page_url",
                "review_rating", 
                "image_url"]
 
-#Fonction d'criture des infos dans le .csv
+#Fonction d'écriture des infos dans le .csv
 
 def infos_produit(product, file_name):
     with open(file_name, "w", newline="") as fichier_csv:
