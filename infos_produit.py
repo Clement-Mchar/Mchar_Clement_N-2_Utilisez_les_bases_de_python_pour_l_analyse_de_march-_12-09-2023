@@ -5,6 +5,8 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 import csv
 
+#J'avais dans l'idée d'utiliser pandas puisqu'il simplifie le code, mais il rend la lecture/écriture plus lente.
+
 
 #Je spécifie directement le nom des attributs pour ne pas avoir à les répéter sans cesse, juste au cas où
 
@@ -22,7 +24,7 @@ field_names = ["product_page_url",
 
 def infos_produit(product, file_name):
     with open(file_name, "w", newline="", encoding="utf-8") as fichier_csv:
-        writer = csv.DictWriter(fichier_csv, fieldnames= field_names )
+        writer = csv.DictWriter(fichier_csv, fieldnames= field_names, delimiter=",")
         writer.writeheader()
         writer.writerow(product)
 
@@ -40,7 +42,7 @@ def scrap_a_book():
     product = {
         "product_page_url" : url,
         "universal_product_code" : soup.find('th', string= "UPC").find_next('td').string,
-        "title" : soup.find("h1").text,
+        "title" : soup.find("h1").string,
         "price_including_tax" : soup.find("th", string= "Price (incl. tax)").find_next('td').string,
         "price_excluding_tax" : soup.find("th", string= "Price (excl. tax)").find_next('td').string,
         "number_available" : soup.find("th", string= "Availability").find_next('td').string,
