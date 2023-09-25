@@ -6,7 +6,7 @@ from urllib.parse import urljoin
 #J'importe les dépendances et je créé la fonction qui ajoute une ligne de produit au .csv
 
 def add_a_row(product, filename):
-    with open(filename, "a", newline="", encoding="utf-8", delimiter=",") as fichier_csv :
+    with open(filename, "a", newline="", encoding="utf-8") as fichier_csv :
         writer = csv.writer(fichier_csv)
         writer.writerow(product)
 
@@ -17,7 +17,7 @@ def scrape_a_book(book_url) :
     soup = BeautifulSoup(reponse.content, 'html.parser')
 
     product = {
-        "product_page_url": book_url,
+        "product_page_url": book_url + " ",
         "universal_product_code": soup.find('th', string="UPC").find_next('td').string,
         "title": soup.find("h1").text,
         "price_including_tax": soup.find("th", string="Price (incl. tax)").find_next('td').string,
@@ -29,7 +29,7 @@ def scrape_a_book(book_url) :
         "image_url": urljoin(book_url, soup.find("img")["src"])
     }
 
-    add_a_row(list(product.values), "products.csv")
+    add_a_row(list(product.values()), "products.csv")
 
 #^La ligne du dessus appelle la fonction qui ajoute une ligne avec les valeurs de chaque livre au .csv final, sous forme de liste
 
@@ -59,5 +59,21 @@ def scrape_category(category_url):
 
 category_url = 'http://books.toscrape.com/catalogue/category/books/mystery_3/index.html' #Je défini l'url par défaut du paramètre de la fonction scrape_category
 
+#Je définis l'en-tête et j'écris le fichier csv qui contiendra toutes les infos de tous les livres de la catégorie sus-mentionnée
 
+field_names = ["product_page_url",
+    "universal_product_code", 
+    "title", "price_including_tax", 
+    "price_excluding_tax", 
+    "number_available", "product_description", 
+    "category", 
+    "review_rating", 
+    "image_url"]
 
+with open("products.csv", "w", newline="", encoding="utf-8") as fichier_csv:
+    writer = csv.writer(fichier_csv)
+    writer.writerow(field_names)
+
+#J'appelle la fonction qui permettra au script de se lancer
+
+scrape_category(category_url)
