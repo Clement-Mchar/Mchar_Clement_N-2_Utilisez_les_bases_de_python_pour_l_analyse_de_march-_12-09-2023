@@ -49,7 +49,15 @@ def scrape_category(category_url):
                 book_url = urljoin(category_url, lien["href"])
                 scrape_a_book(book_url)
         next_button = soup.find("li", class_="next")
-        next_page_url = urljoin(category_url, next_button.find("a")["href"])        
+        if next_button :
+            next_page_url = urljoin(category_url, next_button.find("a")["href"])
+
+        else :
+            None
+        
         category_url = next_page_url
 
-category_url = 'http://books.toscrape.com/catalogue/category/books/mystery_3/index.html'
+category_url = 'http://books.toscrape.com/catalogue/category/books/mystery_3/index.html' #Je défini l'url par défaut du paramètre de la fonction scrape_category
+
+
+
