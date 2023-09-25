@@ -7,14 +7,14 @@ from urllib.parse import urljoin
 
 def add_a_row(product, filename):
     with open(filename, "a", newline="", encoding="utf-8", delimiter=",") as fichier_csv :
-        writer : csv.writer(fichier_csv)
+        writer = csv.writer(fichier_csv)
         writer.writerow(product)
 
 #^Je n'écris pas l'en-tête ici sinon elle s'écrira à chaque itération de la fonction suivante
 
 def scrape_a_book(book_url) :
-    reponse : requests.get(book_url)
-    soup : BeautifulSoup(reponse.content, 'html.parser')
+    reponse = requests.get(book_url)
+    soup = BeautifulSoup(reponse.content, 'html.parser')
 
     product = {
         "product_page_url": book_url,
@@ -38,8 +38,8 @@ def scrape_a_book(book_url) :
 
 def scrape_category(category_url):
     while category_url :
-        reponse : requests.get(category_url)
-        soup : BeautifulSoup(reponse.content, "html.parser")
+        reponse = requests.get(category_url)
+        soup = BeautifulSoup(reponse.content, "html.parser")
 
         books_names = soup.find_all("h3")
 
@@ -53,7 +53,7 @@ def scrape_category(category_url):
             next_page_url = urljoin(category_url, next_button.find("a")["href"])
 
         else :
-            None
+            next_page_url = None
         
         category_url = next_page_url
 
