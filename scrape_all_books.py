@@ -21,14 +21,14 @@ def scrape_a_book(book_url, category_name) :
         "price_including_tax": soup.find("th", string="Price (incl. tax)").find_next('td').string,
         "price_excluding_tax": soup.find("th", string="Price (excl. tax)").find_next('td').string,
         "number_available": soup.find("th", string="Availability").find_next('td').string,
-        "product_description": soup.find("div", class_="sub-header").find_next('p').string.strip(),
+        "product_description": soup.find("div", class_="sub-header").find_next('p').text.strip(),
         "category": category_name,
         "review_rating": soup.find("p", class_="star-rating")["class"][1],
         "image_url": urljoin(book_url, soup.find("img")["src"])
     }
 
 
-    add_a_row(list(product.values()))
+    add_a_row(list(product.values()), category_name)
 
 def scrape_category(category_url):
     while category_url :
@@ -70,3 +70,16 @@ def scrape_category(category_url):
         else :
             category_url = None
 
+def scrape_all_books(index_url):
+    reponse = requests.get(index_url)
+    soup = BeautifulSoup(reponse.content, 'html.parser')
+
+    categories = soup.select(".side_categories ul li ul li")
+    category_urls = [urljoin(index_url, category.find("a")["href"]) for category in categories]
+    
+    for category_url in category_urls:
+        scrape_category(category_url)
+
+index_url = 'http://books.toscrape.com'
+
+scrape_all_books(index_url)
