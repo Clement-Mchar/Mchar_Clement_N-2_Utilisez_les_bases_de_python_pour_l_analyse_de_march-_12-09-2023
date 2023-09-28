@@ -2,7 +2,7 @@ import requests
 import csv
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
-
+import os
 
 
 def add_a_row(product, filename):
@@ -27,8 +27,12 @@ def scrape_a_book(book_url, category_name) :
         "image_url": urljoin(book_url, soup.find("img")["src"])
     }
 
+    if not os.path.exists("Books"):
+        os.mkdir("Books")
 
-    add_a_row(list(product.values()), category_name)
+    category_filename = os.path.join("Books", f"{category_name}.csv")
+
+    add_a_row(list(product.values()), category_filename)    
 
 def scrape_category(category_url):
     while category_url :
@@ -49,10 +53,16 @@ def scrape_category(category_url):
             "review_rating", 
             "image_url"
             ]
+        
+        if not os.path.exists("Books"):
+            os.mkdir("Books")
 
-        with open(category_name, "w", newline="", encoding="utf-8") as fichier_csv:
-            writer = csv.writer(fichier_csv)
-            writer.writerow(field_names)
+        category_filename = os.path.join("Books", f"{category_name}.csv")
+
+        if not os.path.exists(category_filename):
+            with open(category_filename, "w", newline="", encoding="utf-8") as fichier_csv:
+                writer = csv.writer(fichier_csv)
+                writer.writerow(field_names)
 
         books_names = soup.find_all("h3")
 
