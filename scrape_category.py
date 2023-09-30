@@ -1,17 +1,16 @@
+#Importe les dépendances
 import requests
 import csv
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
-#J'importe les dépendances et je créé la fonction qui ajoute une ligne de produit au .csv
-
+#Fonction qui écrit une ligne par livre dans le .csv de sa catégorie
 def add_a_row(product, filename):
     with open(filename, "a", newline="", encoding="utf-8") as fichier_csv :
         writer = csv.writer(fichier_csv)
         writer.writerow(product)
 
-#^Je n'écris pas l'en-tête ici sinon elle s'écrira à chaque itération de la fonction suivante
-
+#Fonction qui extrait les informations d'un livre
 def scrape_a_book(book_url) :
     reponse = requests.get(book_url)
     soup = BeautifulSoup(reponse.content, 'html.parser')
@@ -31,11 +30,7 @@ def scrape_a_book(book_url) :
 
     add_a_row(list(product.values()), "products.csv")
 
-#^La ligne du dessus appelle la fonction qui ajoute une ligne avec les valeurs de chaque livre au .csv final, sous forme de liste
-
-
-#Je créé la fonction qui permet d'itérer sur chaque url de chaque livre tant qu'il reste une page dans la catégorie, puis sur le bouton "next", jusqu'à ce qu'il n'y en ai plus
-
+#Fonction qui itère sur toutes les pages d'une catégorie pour récupérer les infos de tous les livres
 def scrape_category(category_url):
     while category_url :
         reponse = requests.get(category_url)
@@ -57,10 +52,9 @@ def scrape_category(category_url):
         
         category_url = next_page_url
 
-category_url = 'http://books.toscrape.com/catalogue/category/books/mystery_3/index.html' #Je défini l'url par défaut du paramètre de la fonction scrape_category
+category_url = 'http://books.toscrape.com/catalogue/category/books/mystery_3/index.html'
 
-#Je définis l'en-tête et j'écris le fichier csv qui contiendra toutes les infos de tous les livres de la catégorie sus-mentionnée
-
+#Écriture de l'en-tête du fichier .csv
 field_names = ["product_page_url",
     "universal_product_code", 
     "title", "price_including_tax", 
@@ -74,6 +68,6 @@ with open("products.csv", "w", newline="", encoding="utf-8") as fichier_csv:
     writer = csv.writer(fichier_csv)
     writer.writerow(field_names)
 
-#J'appelle la fonction qui permettra au script de se lancer
-
-scrape_category(category_url)
+#Appel de la fonction principale
+if __name__ == "__main__" :
+    scrape_category(category_url)
