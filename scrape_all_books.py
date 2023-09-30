@@ -6,12 +6,15 @@ import os
 import urllib.request
 import re
 import textwrap
+from concurrent.futures import ThreadPoolExecutor
 
+#Fonction qui écrit une ligne par livre dans le .csv de sa catégorie
 def add_a_row(product, filename):
     with open(filename, "a", newline="", encoding="utf-8") as fichier_csv :
         writer = csv.writer(fichier_csv)
         writer.writerow(product)
 
+#Fonction qui extrait les informations d'un livre
 def scrape_a_book(book_url, category_name) :
     reponse = requests.get(book_url)
     soup = BeautifulSoup(reponse.content, 'html.parser')
@@ -38,19 +41,20 @@ def scrape_a_book(book_url, category_name) :
     category_filename = os.path.join("Books", f"{category_name}.csv")
     
     if not os.path.exists("Books_Covers") :
-        os.mkdir("Books_Covers")
+        os.mkdir("Books_Covers") #Créé un dossier "Books_Covers"
 
     book_title = soup.find("h1").text
-    clean_title = re.sub('[^A-Za-z0-9]+', " ", book_title).strip("'").replace("é", "e")
+    clean_title = re.sub('[^A-Za-z0-9]+', " ", book_title).strip("'")
     max_length = 115
     shorter_title = textwrap.shorten(clean_title, width= max_length, placeholder="...")
     image_name =  f"{shorter_title}.jpg"
-    image_path = os.path.join("Books_Covers", image_name)
+    image_path = os.path.join("Books_Covers", image_name) #Formate les titres des livres pour éviter les erreurs
     
-    urllib.request.urlretrieve(image_url, image_path)
+    urllib.request.urlretrieve(image_url, image_path) #Télécharge l'image de chaque livre dans le dossier "Books_Covers"
     
     add_a_row(list(product.values()), category_filename)    
 
+#Fonction qui itère sur toutes les pages d'une catégorie pour récupérer les infos de tous les livres
 def scrape_category(category_url):
     while category_url :
         reponse = requests.get(category_url)
@@ -72,14 +76,14 @@ def scrape_category(category_url):
             ]
         
         if not os.path.exists("Books"):
-            os.mkdir("Books")
+            os.mkdir("Books") #Créé un dossier "Books"
 
         category_filename = os.path.join("Books", f"{category_name}.csv")
 
         if not os.path.exists(category_filename):
             with open(category_filename, "w", newline="", encoding="utf-8") as fichier_csv:
                 writer = csv.writer(fichier_csv)
-                writer.writerow(field_names)
+                writer.writerow(field_names) #Créé un fichier .csv avec une en-tête par catégorie
 
         books_names = soup.find_all("h3")
 
@@ -97,6 +101,7 @@ def scrape_category(category_url):
         else :
             category_url = None
 
+#Fonction qui itère sur toutes les catégories
 def scrape_all_books(index_url):
     reponse = requests.get(index_url)
     soup = BeautifulSoup(reponse.content, 'html.parser')
@@ -104,9 +109,11 @@ def scrape_all_books(index_url):
     categories = soup.select(".side_categories ul li ul li")
     category_urls = [urljoin(index_url, category.find("a")["href"]) for category in categories]
     
-    for category_url in category_urls:
-        scrape_category(category_url)
+    with ThreadPoolExecutor(max_workers=200) as executor:
+        executor.map(scrape_category, category_urls) #Accélère l'extraction des données
 
 index_url = 'http://books.toscrape.com'
 
-scrape_all_books(index_url)
+if __name__ == "__main__" :
+    scrape_all_books(index_url)
+

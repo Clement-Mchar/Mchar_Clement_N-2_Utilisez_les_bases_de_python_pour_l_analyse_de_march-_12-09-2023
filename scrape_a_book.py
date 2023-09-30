@@ -1,15 +1,10 @@
-#Importer les modules nécessaires à l'extraction des données et à l'écriture du fichier .csv
-
+#Importe les modules nécessaires à l'extraction des données et à l'écriture du fichier .csv
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 import csv
 
-#J'avais dans l'idée d'utiliser pandas puisqu'il simplifie le code, mais il rend la lecture/écriture plus lente.
-
-
-#Je spécifie directement le nom des attributs pour ne pas avoir à les répéter sans cesse, juste au cas où
-
+#Formatage de l'en-tête
 field_names = ["product_page_url", 
                "universal_product_code", 
                "title", "price_including_tax", 
@@ -20,24 +15,20 @@ field_names = ["product_page_url",
                "review_rating", 
                "image_url"]
 
-#Fonction d'écriture des infos dans le .csv
 
-def infos_produit(product, file_name):
+#Fonction d'écriture des infos dans le .csv
+def book_infos(product, file_name):
     with open(file_name, "w", newline="", encoding="utf-8") as fichier_csv:
         writer = csv.DictWriter(fichier_csv, fieldnames= field_names, delimiter=",")
         writer.writeheader()
         writer.writerow(product)
 
-#Fonction qui extrait les infos de la page
-
-def scrap_a_book():
+#Fonction qui extrait les infos du livre
+def scrape_a_book():
 
     url = 'http://books.toscrape.com/catalogue/i-know-what-im-doing-and-other-lies-i-tell-myself-dispatches-from-a-life-under-construction_704/index.html'
     reponse = requests.get(url)
     soup = BeautifulSoup(reponse.content, 'html.parser')
-
-
-#Document parsé, plus qu'à indiquer à la fonction où aller chercher les informations. 
 
     product = {
         "product_page_url" : url,
@@ -50,13 +41,10 @@ def scrap_a_book():
         "category" :soup.find("ul", class_="breadcrumb" ).find_all("li")[2].find("a").string,
         "review_rating" : soup.find("p", class_="star-rating")["class"][1],
         "image_url" : urljoin(url, soup.find("img")["src"])
-    }
+    } #Défini le path des informations à extraire
     
-
-#Et à les écrire dans le .csv
-
-    infos_produit(product,"product.csv")
+    book_infos(product,"product.csv")
 
 #On appelle la fonction et le tour est joué
 
-scrap_a_book()
+scrape_a_book()
