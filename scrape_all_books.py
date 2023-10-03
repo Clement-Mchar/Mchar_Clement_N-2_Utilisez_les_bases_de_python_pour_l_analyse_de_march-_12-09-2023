@@ -19,7 +19,7 @@ def scrape_a_book(book_url, category_name) :
     reponse = requests.get(book_url)
     soup = BeautifulSoup(reponse.content, 'html.parser')
 
-    book_title = soup.find("h1").string
+    book_title = soup.find("h1").text
     image_url = urljoin(book_url, soup.find("img")["src"])
 
     product = {
@@ -43,7 +43,6 @@ def scrape_a_book(book_url, category_name) :
     if not os.path.exists("Books_Covers") :
         os.mkdir("Books_Covers") #Créé un dossier "Books_Covers"
 
-    book_title = soup.find("h1").text
     clean_title = re.sub('[^A-Za-z0-9]+', " ", book_title).strip("'")
     max_length = 115
     shorter_title = textwrap.shorten(clean_title, width= max_length, placeholder="...")
@@ -55,9 +54,9 @@ def scrape_a_book(book_url, category_name) :
     add_a_row(list(product.values()), category_filename)    
 
 #Fonction qui itère sur toutes les pages d'une catégorie pour récupérer les infos de tous les livres
-def scrape_category(category_url):
-    while category_url :
-        reponse = requests.get(category_url)
+def scrape_category(category_page):
+    while category_page :
+        reponse = requests.get(category_page)
         soup = BeautifulSoup(reponse.content, "html.parser")
 
         category_name = soup.find("ul", class_="breadcrumb").find_all("li")[-1].string.strip()
@@ -90,16 +89,16 @@ def scrape_category(category_url):
         for book_name in books_names :
             lien = book_name.find("a")
             if lien :
-                book_url = urljoin(category_url, lien["href"])
+                book_url = urljoin(category_page, lien["href"])
                 scrape_a_book(book_url, category_name)
 
         next_button = soup.find("li", class_="next")
         
         if next_button :
-            next_page_url = urljoin(category_url, next_button.find("a")["href"])
-            category_url = next_page_url
+            next_page_url = urljoin(category_page, next_button.find("a")["href"])
+            category_page = next_page_url
         else :
-            category_url = None
+            category_page = None
 
 #Fonction qui itère sur toutes les catégories
 def scrape_all_books(index_url):
