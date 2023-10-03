@@ -1,13 +1,13 @@
-#Scraping de books.toscrape.com
+# Scraping de books.toscrape.com
 
 Ce programme extrait les données de tous les livres du site books.toscrape.com par catégorie sous forme de fichier .csv et télécharge la couverture de chaque livre.
 
-##Prérequis
+## Prérequis
 
 -Python 3.x
 -pip (pour installer les dépendances)
 
-##Installation
+## Installation
 
 1. Sur la page du repository du projet, cliquez sur le bouton vert "code", puis sur "Download ZIP", puis décompressez le .zip.
 
@@ -19,7 +19,7 @@ Ce programme extrait les données de tous les livres du site books.toscrape.com 
 
 
 
-##Utilisation
+## Utilisation
 
 1. Dans le terminal de commande, entrez 'python scrape_all_books.py" (sans les guillemets).
 
