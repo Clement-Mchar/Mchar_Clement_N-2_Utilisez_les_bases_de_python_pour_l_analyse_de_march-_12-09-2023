@@ -16,13 +16,16 @@ Ce programme extrait les données de tous les livres du site books.toscrape.com 
 3. Placez-vous dans le dossier du projet cloné. 
 
 4. Sur Windows : exécutez la commande "python -m venv <nom de l'environnement virtuel> " pour créer votre environnement virtuel.
+
    4.1 Sur Mac, exécutez la commande python3.9 -m venv <nom de l'environnement virtuel>.
+
    4.2 Sur Linux : python3.9 -m venv <nom de l'environnement virtuel>.
 
 6. Sur Windows : Activez l'environnement virtuel en entrant la commande <nom de l'environnement virtuel> \Scripts\activate".
+
    5.1 Sur Mac et linux : source <nom de l'environnement virtuel> /bin/activate
 
-7. Exécutez la commande "pip install -r requirements.txt" pour installer les dépendances nécessaires au déroulement du script.
+8. Exécutez la commande "pip install -r requirements.txt" pour installer les dépendances nécessaires au déroulement du script.
 
 
 
