@@ -4,31 +4,14 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 import csv
 
-#Formatage de l'en-tête
-field_names = ["product_page_url", 
-               "universal_product_code", 
-               "title", "price_including_tax", 
-               "price_excluding_tax", 
-               "number_available", 
-               "product_description", 
-               "category", 
-               "review_rating", 
-               "image_url"]
-
-
-#Fonction d'écriture des infos dans le .csv
-def book_infos(product, file_name):
-    with open(file_name, "w", newline="", encoding="utf-8") as fichier_csv:
-        writer = csv.DictWriter(fichier_csv, fieldnames= field_names, delimiter=",")
-        writer.writeheader()
-        writer.writerow(product)
-
 #Fonction qui extrait les infos du livre
+
 def scrape_a_book():
 
     url = 'http://books.toscrape.com/catalogue/i-know-what-im-doing-and-other-lies-i-tell-myself-dispatches-from-a-life-under-construction_704/index.html'
     reponse = requests.get(url)
     soup = BeautifulSoup(reponse.content, 'html.parser')
+    file_name = "product.csv"
 
     product = {
         "product_page_url" : url,
@@ -42,9 +25,22 @@ def scrape_a_book():
         "review_rating" : soup.find("p", class_="star-rating")["class"][1],
         "image_url" : urljoin(url, soup.find("img")["src"])
     } #Défini le path des informations à extraire
-    
-    book_infos(product,"product.csv")
 
+#Formatage de l'en-tête
+    field_names = ["product_page_url", 
+               "universal_product_code", 
+               "title", "price_including_tax", 
+               "price_excluding_tax", 
+               "number_available", 
+               "product_description", 
+               "category", 
+               "review_rating", 
+               "image_url"]
+    
+    with open(file_name, "w", newline="", encoding="utf-8") as fichier_csv:
+        writer = csv.DictWriter(fichier_csv, fieldnames= field_names, delimiter=",")
+        writer.writeheader()
+        writer.writerow(product) 
 #On appelle la fonction et le tour est joué
 
 scrape_a_book()
