@@ -13,8 +13,7 @@ def scrape_a_book():
     soup = BeautifulSoup(reponse.content, 'html.parser')
     file_name = "product.csv"
 
-    product = {
-        "product_page_url" : url,
+    product = { "product_page_url" : url,
         "universal_product_code" : soup.find('th', string= "UPC").find_next('td').string,
         "title" : soup.find("h1").string,
         "price_including_tax" : soup.find("th", string= "Price (incl. tax)").find_next('td').string,
@@ -23,11 +22,11 @@ def scrape_a_book():
         "product_description" : soup.find("div",{"id": "product_description"}).find_next('p').string.strip(),
         "category" :soup.find("ul", class_="breadcrumb" ).find_all("li")[2].find("a").string,
         "review_rating" : soup.find("p", class_="star-rating")["class"][1],
-        "image_url" : urljoin(url, soup.find("img")["src"])
-    } #Défini le path des informations à extraire
+        "image_url" : urljoin(url, soup.find("img")["src"]) } 
+    #Défini le path des informations à extraire
 
 #Formatage de l'en-tête
-    field_names = ["product_page_url", 
+    field_names = { "product_page_url", 
                "universal_product_code", 
                "title", "price_including_tax", 
                "price_excluding_tax", 
@@ -35,7 +34,7 @@ def scrape_a_book():
                "product_description", 
                "category", 
                "review_rating", 
-               "image_url"]
+               "image_url" }
     
     with open(file_name, "w", newline="", encoding="utf-8") as fichier_csv:
         writer = csv.DictWriter(fichier_csv, fieldnames= field_names, delimiter=",")

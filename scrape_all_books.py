@@ -2,6 +2,7 @@ import requests
 import csv
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
+import pandas as pd
 import os
 import urllib.request
 import re
@@ -10,12 +11,12 @@ from concurrent.futures import ThreadPoolExecutor
 
 #Fonction qui écrit une ligne par livre dans le .csv de sa catégorie
 def add_a_row(product, filename):
-    with open(filename, "a", newline="", encoding="utf-8") as fichier_csv :
+    with open(filename, "a", newline="", encoding="utf-8") as fichier_csv:
         writer = csv.writer(fichier_csv)
         writer.writerow(product)
 
 #Fonction qui extrait les informations d'un livre
-def scrape_a_book(book_url, category_name) :
+def scrape_a_book(book_url, category_name):
     reponse = requests.get(book_url)
     soup = BeautifulSoup(reponse.content, 'html.parser')
 
@@ -23,7 +24,7 @@ def scrape_a_book(book_url, category_name) :
     image_url = urljoin(book_url, soup.find("img")["src"])
 
     product = {
-        "product_page_url": book_url + " ",
+        "product_page_url": book_url,
         "universal_product_code": soup.find('th', string="UPC").find_next('td').string,
         "title": book_title,
         "price_including_tax": soup.find("th", string="Price (incl. tax)").find_next('td').string,
@@ -51,7 +52,12 @@ def scrape_a_book(book_url, category_name) :
     
     urllib.request.urlretrieve(image_url, image_path) #Télécharge l'image de chaque livre dans le dossier "Books_Covers"
     
-    add_a_row(list(product.values()), category_filename)    
+    df = pd.read_csv(category_filename)
+    if not any(df['product_page_url'].str.strip() == product['product_page_url'].strip()):
+        add_a_row(list(product.values()), category_filename)  
+    else:
+        None
+      
 
 #Fonction qui itère sur toutes les pages d'une catégorie pour récupérer les infos de tous les livres
 def scrape_category(category_page):
@@ -85,7 +91,7 @@ def scrape_category(category_page):
                 writer.writerow(field_names) #Créé un fichier .csv avec une en-tête par catégorie
 
         books_names = soup.find_all("h3")
-
+        
         for book_name in books_names :
             lien = book_name.find("a")
             if lien :
